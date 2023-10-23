@@ -12,10 +12,10 @@
   <a href="https://twitter.com/rizasabuncu">  
     <img src="https://img.shields.io/twitter/follow/rizasabuncu.svg?logo=twitter">  
   </a>  
+
 </p>
 
 # Installation
-
 wb requires **go1.17** to install successfully. Run the following command to get the repo -
 
 ```sh
@@ -24,14 +24,40 @@ go install github.com/riza/wb@latest
 
 # Usage
 
+### Quick 
 ```sh
 echo "https://akamai.airbnb.com/robots.txt"|wb 
 ```
+
 ```sh
 wb https://akamai.airbnb.com/robots.txt
 ```
 
-# TODOs
+### Advanced 
+```sh
+Usage: 
+        wb <url> [flags]
 
-* [ ] Timestamp selection 
+  -all
+        get all snapshots
+  -date string
+        get snapshot for a specific date
+  -help
+        show help
+  -no-banner
+        hide banner
+  -snapshots
+        get all snapshots
+```
+
+## Advanced Usage Scenarios
+```sh
+$ under construct
+```
+
+## Donate
+
+<a href="https://www.buymeacoffee.com/rizasabuncu" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
+
+ 
 

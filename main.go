@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+
 	"log"
 	"time"
 
@@ -65,6 +66,7 @@ func main() {
 		snapshots, err := getSnapshots(client, url)
 		if err != nil {
 			log.Printf("failed to snapshots: %s\n", err)
+			continue
 		}
 
 		if *flagSnapshots {
@@ -76,7 +78,7 @@ func main() {
 				}
 				fmt.Printf("* %s | %s | %s\n", s[0], parsedTime.Format(viewTimeLayout), s[1])
 			}
-			os.Exit(0)
+			continue
 		}
 
 		selectedSnapshot := snapshots[len(snapshots)-1]
@@ -93,7 +95,7 @@ func main() {
 			for _, s := range snapshots {
 				snapshotContent, err := getSnapshotContent(client, s[0], s[1])
 				if err != nil {
-					log.Fatalf("failed to read input: %s\n", err)
+					log.Printf("failed to read input: %s\n", err)
 				}
 
 				io.Copy(os.Stdout, snapshotContent)
@@ -103,7 +105,8 @@ func main() {
 
 		snapshotContent, err := getSnapshotContent(client, selectedSnapshot[0], selectedSnapshot[1])
 		if err != nil {
-			log.Fatalf("failed to read input: %s\n", err)
+			log.Printf("failed to read input: %s\n", err)
+			continue
 		}
 
 		io.Copy(os.Stdout, snapshotContent)

@@ -5,15 +5,16 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	log "github.com/sirupsen/logrus"
+	"log"
+	"time"
+
 	"io"
 	"net/http"
 	"os"
-	"time"
 )
 
 const (
-	version = "0.0.4"
+	version = "0.0.5"
 
 	wbSnapshotApiURL = "https://web.archive.org/cdx/search/xd?output=json&url=%s&fl=timestamp,original&collapse=digest&gzip=false&filter=statuscode:200"
 	wbFileURL        = "https://web.archive.org/web/%sid_/%s"
@@ -43,17 +44,13 @@ func main() {
 		os.Exit(0)
 	}
 
-	var url string
+	var urls []string
 	if flag.NArg() > 0 {
-		url = flag.Arg(0)
+		urls[0] = flag.Arg(0)
 	} else {
-		sc := bufio.NewScanner(os.Stdin)
-		for sc.Scan() {
-			url = sc.Text()
-		}
-
-		if err := sc.Err(); err != nil {
-			log.Fatalf("failed to read input: %s\n", err)
+		scanner := bufio.NewScanner(os.Stdin)
+		for scanner.Scan() {
+			urls = append(urls, scanner.Text())
 		}
 	}
 
@@ -61,51 +58,56 @@ func main() {
 		Timeout: time.Second * 5,
 	}
 
-	snapshots, err := getSnapshots(client, url)
-	if err != nil {
-		log.Fatalf("failed to snapshots: %s\n", err)
-	}
-
-	if *flagSnapshots {
-		fmt.Println("Snapshots for", url)
-		for _, s := range snapshots {
-			parsedTime, err := time.Parse(parseTimeLayout, s[0])
-			if err != nil {
-				log.Fatalf("failed to parse time: %s\n", err)
-			}
-			fmt.Printf("* %s | %s | %s\n", s[0], parsedTime.Format(viewTimeLayout), s[1])
+	for _, url := range urls {
+		if len(urls) > 1 {
+			fmt.Println("// Snapshots for", url)
 		}
-		os.Exit(0)
-	}
+		snapshots, err := getSnapshots(client, url)
+		if err != nil {
+			log.Printf("failed to snapshots: %s\n", err)
+		}
 
-	selectedSnapshot := snapshots[len(snapshots)-1]
-	if *flagDate != "" {
-		for _, s := range snapshots {
-			if s[0] == *flagDate {
-				selectedSnapshot = s
-				break
+		if *flagSnapshots {
+			fmt.Println("Snapshots for", url)
+			for _, s := range snapshots {
+				parsedTime, err := time.Parse(parseTimeLayout, s[0])
+				if err != nil {
+					log.Fatalf("failed to parse time: %s\n", err)
+				}
+				fmt.Printf("* %s | %s | %s\n", s[0], parsedTime.Format(viewTimeLayout), s[1])
+			}
+			os.Exit(0)
+		}
+
+		selectedSnapshot := snapshots[len(snapshots)-1]
+		if *flagDate != "" {
+			for _, s := range snapshots {
+				if s[0] == *flagDate {
+					selectedSnapshot = s
+					break
+				}
 			}
 		}
-	}
 
-	if *flagGetAllSnapshots {
-		for _, s := range snapshots {
-			snapshotContent, err := getSnapshotContent(client, s[0], s[1])
-			if err != nil {
-				log.Fatalf("failed to read input: %s\n", err)
+		if *flagGetAllSnapshots {
+			for _, s := range snapshots {
+				snapshotContent, err := getSnapshotContent(client, s[0], s[1])
+				if err != nil {
+					log.Fatalf("failed to read input: %s\n", err)
+				}
+
+				io.Copy(os.Stdout, snapshotContent)
 			}
-
-			io.Copy(os.Stdout, snapshotContent)
+			continue
 		}
-		os.Exit(0)
-	}
 
-	snapshotContent, err := getSnapshotContent(client, selectedSnapshot[0], selectedSnapshot[1])
-	if err != nil {
-		log.Fatalf("failed to read input: %s\n", err)
-	}
+		snapshotContent, err := getSnapshotContent(client, selectedSnapshot[0], selectedSnapshot[1])
+		if err != nil {
+			log.Fatalf("failed to read input: %s\n", err)
+		}
 
-	io.Copy(os.Stdout, snapshotContent)
+		io.Copy(os.Stdout, snapshotContent)
+	}
 }
 
 func getSnapshots(c http.Client, url string) ([][]string, error) {

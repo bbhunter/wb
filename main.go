@@ -47,7 +47,7 @@ func main() {
 
 	var urls []string
 	if flag.NArg() > 0 {
-		urls[0] = flag.Arg(0)
+		urls = []string{flag.Arg(0)}
 	} else {
 		scanner := bufio.NewScanner(os.Stdin)
 		for scanner.Scan() {

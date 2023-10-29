@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	version = "0.0.6"
+	version = "0.0.7"
 
 	wbSnapshotApiURL = "https://web.archive.org/cdx/search/xd?output=json&url=%s&fl=timestamp,original&collapse=digest&gzip=false&filter=statuscode:200"
 	wbFileURL        = "https://web.archive.org/web/%sid_/%s"

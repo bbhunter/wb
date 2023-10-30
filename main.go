@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	version = "0.0.7"
+	version = "0.0.8"
 
 	wbSnapshotApiURL = "https://web.archive.org/cdx/search/xd?output=json&url=%s&fl=timestamp,original&collapse=digest&gzip=false&filter=statuscode:200"
 	wbFileURL        = "https://web.archive.org/web/%sid_/%s"
@@ -25,6 +25,7 @@ const (
 )
 
 var (
+	flagUrl             = flag.String("u", "", "specify url")
 	flagSnapshots       = flag.Bool("snapshots", false, "get all snapshots")
 	flagDate            = flag.String("date", "", "get snapshot for a specific date")
 	flagGetAllSnapshots = flag.Bool("all", false, "get all snapshots")
@@ -40,14 +41,14 @@ func main() {
 	}
 
 	if *flagHelp {
-		fmt.Println("Usage: \n	wb <url> [flags]\n")
+		fmt.Println("Usage: \n	wb [flags]\n")
 		flag.PrintDefaults()
 		os.Exit(0)
 	}
 
 	var urls []string
-	if flag.NArg() > 0 {
-		urls = []string{flag.Arg(0)}
+	if *flagUrl != "" {
+		urls = []string{*flagUrl}
 	} else {
 		scanner := bufio.NewScanner(os.Stdin)
 		for scanner.Scan() {

@@ -36,24 +36,23 @@ wb https://akamai.airbnb.com/robots.txt
 ### Advanced 
 ```sh
 Usage: 
-        wb <url> [flags]
-
+        wb [flags]
+  -u 
+        specify url  
   -all
         get all snapshots
   -date string
         get snapshot for a specific date
-  -help
-        show help
   -no-banner
         hide banner
   -snapshots
         get all snapshots
+  -help
+        show help
 ```
 
 ## Advanced Usage Scenarios
-```sh
-$ under construct
-```
+* [Time-Traveling for Money: Discovering Secrets in Vintage JavaScript Files](https://medium.com/@riza/time-traveling-for-money-discovering-secrets-in-vintage-javascript-files-7deece114b93)
 
 ## Donate
 

@@ -2,6 +2,8 @@ package main
 
 import (
 	"bufio"
+	"compress/gzip"
+	"crypto/tls"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -15,7 +17,7 @@ import (
 )
 
 const (
-	version = "0.0.10"
+	version = "0.0.11"
 
 	wbSnapshotApiURL = "https://web.archive.org/cdx/search/xd?output=json&url=%s&fl=timestamp,original&collapse=digest&gzip=false&filter=statuscode:200"
 	wbFileURL        = "https://web.archive.org/web/%sid_/%s"
@@ -57,10 +59,11 @@ func main() {
 		}
 	}
 
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	client := http.Client{
 		Timeout: *flagTimeout,
 		Transport: &http.Transport{
-			TLSHandshakeTimeout: 10 * time.Second,
+			TLSHandshakeTimeout: *flagTimeout,
 		},
 	}
 
@@ -157,5 +160,14 @@ func getSnapshotContent(c http.Client, ts, url string) (io.ReadCloser, error) {
 		return nil, fmt.Errorf("getSnapshotContent: failed to send request waybackmachine api: %w url: %s", err, url)
 	}
 
-	return rsp.Body, nil
+	var reader io.ReadCloser
+	switch rsp.Header.Get("Content-Encoding") {
+	case "gzip":
+		reader, err = gzip.NewReader(rsp.Body)
+		defer reader.Close()
+	default:
+		reader = rsp.Body
+	}
+
+	return reader, nil
 }

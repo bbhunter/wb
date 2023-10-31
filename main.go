@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	version = "0.0.8"
+	version = "0.0.9"
 
 	wbSnapshotApiURL = "https://web.archive.org/cdx/search/xd?output=json&url=%s&fl=timestamp,original&collapse=digest&gzip=false&filter=statuscode:200"
 	wbFileURL        = "https://web.archive.org/web/%sid_/%s"
@@ -26,6 +26,7 @@ const (
 
 var (
 	flagUrl             = flag.String("u", "", "specify url")
+	flagTimeout         = flag.Duration("t", 5*time.Second, "specify timeout")
 	flagSnapshots       = flag.Bool("snapshots", false, "get all snapshots")
 	flagDate            = flag.String("date", "", "get snapshot for a specific date")
 	flagGetAllSnapshots = flag.Bool("all", false, "get all snapshots")
@@ -57,7 +58,7 @@ func main() {
 	}
 
 	client := http.Client{
-		Timeout: time.Second * 5,
+		Timeout: *flagTimeout,
 	}
 
 	for _, url := range urls {

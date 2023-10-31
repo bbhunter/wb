@@ -15,7 +15,7 @@ import (
 )
 
 const (
-	version = "0.0.9"
+	version = "0.0.10"
 
 	wbSnapshotApiURL = "https://web.archive.org/cdx/search/xd?output=json&url=%s&fl=timestamp,original&collapse=digest&gzip=false&filter=statuscode:200"
 	wbFileURL        = "https://web.archive.org/web/%sid_/%s"
@@ -59,6 +59,9 @@ func main() {
 
 	client := http.Client{
 		Timeout: *flagTimeout,
+		Transport: &http.Transport{
+			TLSHandshakeTimeout: 10 * time.Second,
+		},
 	}
 
 	for _, url := range urls {

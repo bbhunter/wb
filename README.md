@@ -39,6 +39,8 @@ Usage:
         wb [flags]
   -u 
         specify url  
+  -t
+        specift http timeout
   -all
         get all snapshots
   -date string
